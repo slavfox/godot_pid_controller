@@ -1,0 +1,4 @@
+.import/
+*.import
+.sconsign.dblite
+src/*.os

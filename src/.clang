@@ -1,0 +1,2 @@
+flags = -fPIC -I..include/godot-cpp/include -I..include/godot-cpp/include/core
+-I..include/godot-cpp/include/gen -I..include/godot-cpp/godot_headers
