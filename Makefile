@@ -37,12 +37,6 @@ ifndef TARGET
 TARGET=debug
 endif
 
-ifndef NO_LLVM
-LLVM="use_llvm=True"
-else
-LLVM=
-endif
-
 ifeq ($(PLATFORM),linux)
 	build_target=bin/x11/libpidcontroller.so
 else
@@ -90,29 +84,29 @@ osx: bin/osx/libpidcontroller.dylib
 
 include/godot-cpp/bin/libgodot-cpp.linux.*: include/godot-cpp/godot_headers/api.json
 	@echo -e "$(INFO) Compiling godot-cpp bindings for linux - this will take a while"
-	cd include/godot-cpp; scons platform=linux generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM) 
+	cd include/godot-cpp; scons platform=linux generate_bindings=yes bits=$(BITS) target=$(TARGET) 
 	
 bin/x11/libpidcontroller.so: include/godot-cpp/bin/libgodot-cpp.linux.*
 	@echo -e "$(INFO) Compiling Linux plugin"
-	scons platform=linux bits=$(BITS) target=$(TARGET) $(LLVM)
+	scons platform=linux bits=$(BITS) target=$(TARGET)
 
 
 include/godot-cpp/bin/libgodot-cpp.windows.*: include/godot-cpp/godot_headers/api.json
 	@echo -e "$(INFO) Compiling godot-cpp bindings for windows - this will take a while"
-	cd include/godot-cpp; scons platform=windows generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM) 
+	cd include/godot-cpp; scons platform=windows generate_bindings=yes bits=$(BITS) target=$(TARGET) 
 	
 bin/win64/libpidcontroller.dll: include/godot-cpp/bin/libgodot-cpp.windows.*
 	@echo -e "$(INFO) Compiling Windows plugin - this probably doesn't work"
-	scons platform=windows bits=$(BITS) target=$(TARGET) $(LLVM)
+	scons platform=windows bits=$(BITS) target=$(TARGET)
 
 
 include/godot-cpp/bin/libgodot-cpp.osx.*:  include/godot-cpp/godot_headers/api.json
 	@echo -e "$(INFO) Compiling godot-cpp bindings for osx - this will take a while"
-	cd include/godot-cpp; scons platform=osx generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM) 
+	cd include/godot-cpp; scons platform=osx generate_bindings=yes bits=$(BITS) target=$(TARGET)
 	
 bin/osx/libpidcontroller.dylib: include/godot-cpp/bin/libgodot-cpp.osx.*
 	@echo -e "$(INFO) Compiling OSX plugin - this probably doesn't work"
-	scons platform=windows bits=$(BITS) target=$(TARGET) $(LLVM)
+	scons platform=osx bits=$(BITS) target=$(TARGET)
 
 
 .PHONY: help
@@ -121,10 +115,9 @@ help:
 	@echo -e "$(GREEN)Godot PID Controller$(NC)"
 	@echo -e "$(GREEN)====================$(NC)"
 	@echo -e "\n$(YELLOW)Environment variables$(NC):"
-	@echo -e "  $(GREEN)PLATFORM       $(NC)- set to \"linux\" (default), \"windows\" or \"osx\""
+	@echo -e "  $(GREEN)PLATFORM       $(NC)- set to \"linux\", \"windows\" or \"osx\". If omitted, builds for your current platform."
 	@echo -e "  $(GREEN)TARGET         $(NC)- set to \"debug\" (default) or \"release\""
 	@echo -e "  $(GREEN)BITS           $(NC)- set to \"64\" (default) or \"32\""
-	@echo -e "  $(GREEN)NO_LLVM        $(NC)- set anything to use g++ instead of LLVM"
 	@echo -e "\n$(YELLOW)Commands$(NC):"
 	@echo -e "  $(GREEN)make help         $(NC)- display this message"
 	@echo -e "  $(GREEN)make              $(NC)- build $(build_target) for platform: $(PLATFORM)"
