@@ -2,3 +2,4 @@
 *.import
 .sconsign.dblite
 src/*.os
+include/godot-cpp/bin/

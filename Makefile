@@ -18,7 +18,15 @@ $(info $(INFO) Output coloring is enabled. Pass NOCOLOR=true to disable.)
 endif
 
 ifndef PLATFORM
-PLATFORM=linux
+ifeq ($(OS), Windows_NT)
+	PLATFORM=windows
+else
+ifeq ($(shell uname), Darwin)
+	PLATFORM=osx
+else
+	PLATFORM=linux
+endif
+endif
 endif
 
 ifndef BITS
@@ -60,16 +68,7 @@ submodules: include/godot-cpp/Makefile
 clean:
 	@echo -e "$(INFO) Cleaning build files"
 	rm -rf src/*.os
-
-.PHONY: rebuild-godot-cpp
-rebuild-godot-cpp:
-	@echo -e "$(INFO) Deleting compiled godot-cpp bindings (if any)"
-	rm -rf include/godot-cpp/include/gen/*
-	
-.PHONY: linux windows mac
-linux: bin/x11/libpidcontroller.so
-windows64: bin/win64/libpidcontroller.dll
-osx: bin/osx/libpidcontroller.dylib
+	rm -rf include/godot-cpp/bin/
 
 include/godot-cpp/Makefile:
 	@echo -e "$(INFO) Initializing git submodules for godot_pid_controller"
@@ -83,32 +82,38 @@ include/godot-cpp/godot_headers/api.json: include/godot-cpp/Makefile
 	cd include/godot-cpp; git submodule init && git submodule update
 	@echo -e "$(INFO) Git submodules for godot-cpp successfully updated"
 
-.PHONY: linux-bindings
-linux-bindings: rebuild-godot-cpp include/godot-cpp/godot_headers/api.json
+
+.PHONY: linux windows mac
+linux: bin/x11/libpidcontroller.so
+windows64: bin/win64/libpidcontroller.dll
+osx: bin/osx/libpidcontroller.dylib
+
+include/godot-cpp/bin/libgodot-cpp.linux.*: include/godot-cpp/godot_headers/api.json
 	@echo -e "$(INFO) Compiling godot-cpp bindings for linux - this will take a while"
 	cd include/godot-cpp; scons platform=linux generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM) 
+	
+bin/x11/libpidcontroller.so: include/godot-cpp/bin/libgodot-cpp.linux.*
+	@echo -e "$(INFO) Compiling Linux plugin"
+	scons platform=linux bits=$(BITS) target=$(TARGET) $(LLVM)
 
-.PHONY: windows-bindings
-windows-bindings: rebuild-godot-cpp include/godot-cpp/godot_headers/api.json
+
+include/godot-cpp/bin/libgodot-cpp.windows.*: include/godot-cpp/godot_headers/api.json
 	@echo -e "$(INFO) Compiling godot-cpp bindings for windows - this will take a while"
 	cd include/godot-cpp; scons platform=windows generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM) 
+	
+bin/win64/libpidcontroller.dll: include/godot-cpp/bin/libgodot-cpp.windows.*
+	@echo -e "$(INFO) Compiling Windows plugin - this probably doesn't work"
+	scons platform=windows bits=$(BITS) target=$(TARGET) $(LLVM)
 
-.PHONY: osx-bindings
-osx-bindings: rebuild-godot-cpp include/godot-cpp/godot_headers/api.json
+
+include/godot-cpp/bin/libgodot-cpp.osx.*:  include/godot-cpp/godot_headers/api.json
 	@echo -e "$(INFO) Compiling godot-cpp bindings for osx - this will take a while"
 	cd include/godot-cpp; scons platform=osx generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM) 
 	
-bin/x11/libpidcontroller.so: linux-bindings
-	@echo -e "$(INFO) Compiling Linux plugin"
-	scons platform=linux generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM)
-	
-bin/win64/libpidcontroller.dll: windows-bindings
-	@echo -e "$(INFO) Compiling Windows plugin - this probably doesn't work"
-	scons platform=windows generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM)
-	
-bin/osx/libpidcontroller.dylib: osx-bindings
+bin/osx/libpidcontroller.dylib: include/godot-cpp/bin/libgodot-cpp.osx.*
 	@echo -e "$(INFO) Compiling OSX plugin - this probably doesn't work"
-	scons platform=windows generate_bindings=yes bits=$(BITS) target=$(TARGET) $(LLVM)
+	scons platform=windows bits=$(BITS) target=$(TARGET) $(LLVM)
+
 
 .PHONY: help
 help:

@@ -2,7 +2,7 @@
 #define GDPIDCONTROLLER_H
 
 #include <Godot.hpp>
-#include <Sprite.hpp>
+#include <Reference.hpp>
 
 namespace godot {
 

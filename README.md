@@ -6,6 +6,8 @@ Implements simple, very fast [PID and PD controllers](https://en.wikipedia.org/w
 
 ## Installation
 
+### Linux
+
 Clone this repo into your Godot project:
 ```
 $ git clone git@github.com:slavfox/godot_pid_controller.git
@@ -14,6 +16,10 @@ Or add it as a submodule:
 ```
 $ git submodule add git@github.com:slavfox/godot_pid_controller.git
 ```
+
+### Windows & macOS
+
+See **[Development and Building](#development-and-building)**
 
 ## Usage
 
@@ -40,7 +46,7 @@ And then just call `PIDController.get_output(error: float, dt: float)` with the 
 
 ## Development and building
 
-(Building on non-Linux platforms is probably broken)
+(Building on non-Linux platforms is probably broken, pull requests welcome)
 
 Make your changes to the source (in [src/](https://github.com/slavfox/godot_pid_controller/tree/master/src/)), and then run
 ```
@@ -52,6 +58,8 @@ There are additional options available for building. Run
 $ make help
 ```
 to see them.
+
+If you want to change the build process, you might need to edit the [SConstruct file](https://github.com/slavfox/godot_pid_controller/blob/master/SConstruct) or [the Makefile](https://github.com/slavfox/godot_pid_controller/blob/master/Makefile).
 
 ## License
 
